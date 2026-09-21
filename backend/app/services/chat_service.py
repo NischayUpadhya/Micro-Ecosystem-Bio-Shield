@@ -16,6 +16,24 @@ class SustainabilityChatService:
         observations = fetch_all_observations()
 
         # 1. Check for questions about observed invasive species
+
+        # Responsible AI Guard: Authorization / Removal requests
+        lower = query.lower()
+        if (any(word in lower for word in ["authorize","approval","permit","allow","permission","who must approve","who can approve"]) and
+            any(word in lower for word in ["remove","eradicate","cut","contain","removal"])):
+            disclaimer = ("**Responsible AI Notice:** I am a decision‑support tool and **cannot independently authorize** "
+                         "the removal of invasive species. Any removal action must be reviewed and approved by the Campus "
+                         "Groundskeeping Lead or a qualified botany expert.")
+            rag_res = rag_service.query_knowledge_base(query)
+            info = rag_res.answer if rag_res.status == "verified" else ""
+            reply = f"{disclaimer}\n\n{info}" if info else disclaimer
+            return ChatResponse(
+                reply=reply,
+                sources=rag_res.sources if rag_res.status == "verified" else [],
+                expert_verification_suggested=False,
+                safe_management_flags=["Responsible AI Guard"],
+                data_category="AI-generated"
+            )
         if "invasive" in query or "flagged" in query:
             invasives = [o for o in observations if o["ecological_status"] == "Potentially invasive"]
             names = list({f"{o['plant_name']} (*{o['scientific_name']}*)" for o in invasives})
