@@ -53,8 +53,44 @@ class SustainabilityChatService:
                 data_category="AI-generated"
             )
 
-        # 2. Questions about restoration or corridor zones or ecological deserts
+                # 2. Questions about restoration or corridor zones or ecological deserts
         elif "restoration" in query or "corridor" in query or "desert" in query or "areas" in query:
+            # Responsible AI guard for proof‑of‑corridor queries
+            if ("corridor" in query and "prove" in query) or ("pollinator" in query and "prove" in query) or ("prove" in query and "bees" in query):
+                disclaimer = (
+                    "**Responsible AI Notice:** The proposed pollinator corridor is a recommendation/inference based on available ecological information. "
+                    "It does NOT prove actual bee/pollinator movement. Empirical field observation or monitoring is required to validate movement."
+                )
+                # Build standard corridor response
+                deserts_text = "\n".join([f"- **{d['name']}**: {d['rationale']}" for d in DESERT_ZONES])
+                hotspots_text = "\n".join([f"- **{h['name']}**: {h['description']}" for h in HOTSPOT_ZONES])
+                corridor_reply = (
+                    "### Bengaluru Campus Ecological Landscape Assessment\n\n"
+                    "**Potential Ecological Deserts (High Restoration Need):**\n"
+                    f"{deserts_text}\n\n"
+                    "**Active Biodiversity Hotspots (Conservation Anchors):**\n"
+                    f"{hotspots_text}\n\n"
+                    "**Recommended Action:** Deploy stepping‑stone pollinator patches connecting North Meadow Sanctuary across the Central Promenade towards the Bio‑Swale."
+                )
+                reply = f"{disclaimer}\n\n{corridor_reply}"
+                return ChatResponse(
+                    reply=reply,
+                    sources=[
+                        RAGSource(
+                            source_title="Campus Pollinator Corridor Framework",
+                            source_organization="Bengaluru Campus Ecological Stewardship Working Group",
+                            region="India / Karnataka / Bengaluru Urban",
+                            url_or_reference="BCESWG Technical Report 2026",
+                            verification_status="Prototype reference — not yet connected to live verified knowledge.",
+                            excerpt="Stepping‑stone habitat connectivity increases pollinator foraging range by up to 35% across urbanized academic campuses.",
+                            confidence_alignment=0.92
+                        )
+                    ],
+                    expert_verification_suggested=False,
+                    safe_management_flags=["Stepping‑Stone Connectivity", "Native Meadow Conversion"],
+                    data_category="AI-generated"
+                )
+            # Normal corridor response
             deserts_text = "\n".join([f"- **{d['name']}**: {d['rationale']}" for d in DESERT_ZONES])
             hotspots_text = "\n".join([f"- **{h['name']}**: {h['description']}" for h in HOTSPOT_ZONES])
 
@@ -64,7 +100,7 @@ class SustainabilityChatService:
                 f"{deserts_text}\n\n"
                 "**Active Biodiversity Hotspots (Conservation Anchors):**\n"
                 f"{hotspots_text}\n\n"
-                "**Recommended Action:** Deploy stepping-stone pollinator patches connecting North Meadow Sanctuary across the Central Promenade toward the Bio-Swale."
+                "**Recommended Action:** Deploy stepping‑stone pollinator patches connecting North Meadow Sanctuary across the Central Promenade towards the Bio‑Swale."
             )
             return ChatResponse(
                 reply=reply,
@@ -75,12 +111,12 @@ class SustainabilityChatService:
                         region="India / Karnataka / Bengaluru Urban",
                         url_or_reference="BCESWG Technical Report 2026",
                         verification_status="Prototype reference — not yet connected to live verified knowledge.",
-                        excerpt="Stepping-stone habitat connectivity increases pollinator foraging range by up to 35% across urbanized academic campuses.",
+                        excerpt="Stepping‑stone habitat connectivity increases pollinator foraging range by up to 35% across urbanized academic campuses.",
                         confidence_alignment=0.92
                     )
                 ],
                 expert_verification_suggested=False,
-                safe_management_flags=["Stepping-Stone Connectivity", "Native Meadow Conversion"],
+                safe_management_flags=["Stepping‑Stone Connectivity", "Native Meadow Conversion"],
                 data_category="AI-generated"
             )
 
